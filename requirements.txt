@@ -115,7 +115,7 @@ tqdm==4.31.1
 twisted==19.7.0
 typing-extensions==3.7.2
 u-msgpack-python==2.5.0
-urllib3==1.24.1
+urllib3==1.24.2
 virtualenv==16.4.3
 w3lib==1.18.0
 webencodings==0.5.1
