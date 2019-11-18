@@ -7,7 +7,7 @@ charts==0.4.6
 click==6.7
 constantly==15.1.0
 coverage==3.7.1
-cryptography==2.1.4
+cryptography==2.3
 cssselect==1.0.3
 cycler==0.10.0
 defusedxml==0.5.0
