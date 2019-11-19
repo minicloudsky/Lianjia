@@ -1,4 +1,4 @@
-from data_visualize.data_analysis import data_analysis
+from visualization.data_analysis import data_analysis
 from spider.crawl_lianjia import crawl_lianjia
 from lianjia.app import app
 import time

@@ -1,6 +1,6 @@
 from lianjia.constants import *
 import os
-from data_visualize.common import base_path
+from visualization.common import base_path
 
 from config.configs import *
 

@@ -1,12 +1,12 @@
 import pymongo
 import time
-from data_visualize.echarts import charts
+from visualization.echarts import charts
 import os
-from data_visualize.common import *
+from visualization.common import *
 from pyecharts.render import make_snapshot
 # 使用 snapshot-selenium 渲染图片
 from snapshot_selenium import snapshot
-from data_visualize.lang import *
+from visualization.lang import *
 from config.configs import *
 from .common import *
 

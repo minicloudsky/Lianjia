@@ -5,6 +5,11 @@
         *  data_visualize模块聚合MongoDB进行数据分析后，利用pyecharts生成图表保存到本地
         * 通过flask实现数据的网站展示
 ---
+## notes: The project is under refactor
+### todo
+#### refactor website with django
+#### refactor database with mysql and mongodb 
+
 + 项目运行步骤：
 + 安装依赖的python包
 + pip install -r requirements.txt

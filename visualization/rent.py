@@ -1,6 +1,6 @@
-from data_visualize.common import *
+from visualization.common import *
 import os
-from data_visualize.echarts import charts
+from visualization.echarts import charts
 from pyecharts.render import make_snapshot
 # 使用 snapshot-selenium 渲染图片
 from snapshot_selenium import snapshot

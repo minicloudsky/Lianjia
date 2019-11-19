@@ -1,6 +1,6 @@
-from data_visualize.newhouse import newhouse
-from data_visualize.ershoufang import ershoufang
-from data_visualize.rent import rent
+from visualization.newhouse import newhouse
+from visualization.ershoufang import ershoufang
+from visualization.rent import rent
 import os
 from config.configs import *
 
@@ -8,7 +8,7 @@ from config.configs import *
 def data_analysis():
     print('start data analysis')
     print(os.getcwd())
-    os.chdir('data_visualize')
+    os.chdir('visualization')
     print(os.getcwd())
     data_analysis_status = '正在进行二手房数据分析'
     one = ershoufang()
