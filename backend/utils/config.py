@@ -9,6 +9,7 @@ mysql_password = 'root'
 city_default_max_page = 500
 
 city_dict_key = 'city_dict_v1'
+city_house_urls_key = 'city_house_urls_{}_v1'
 ershoufang_city_house_urls_key = 'ershoufang_city_house_urls_v1'
 
 
