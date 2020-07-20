@@ -9,7 +9,8 @@ html文本解析器
 
 class CloudSkyHtmlParser:
     # 噪音文本
-    noises = [' ', '\n\n\n', '\n\n', 'VR房源', '随时看房', '户型分间', '咨询经纪人首付']
+    noises = [' ', '\n\n\n', '\n\n', 'VR房源', '随时看房', '户型分间',
+              '咨询经纪人首付', '基础属性', '房源动态', '房源户型']
 
     # 根据 css 选择器类名获取文本
     def get_texts_by_class_name(self, html, class_names):
@@ -49,6 +50,7 @@ class CloudSkyHtmlParser:
             text = text.replace(noise, '')
         return text
 
+    # 匹配正数
     def match_positive_number(self, text):
         if '.' in text:
             number = re.findall(".+?(\d+.\d+).+?", text)

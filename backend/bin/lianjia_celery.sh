@@ -2,4 +2,4 @@
 
 source /home/.jywcode/lianjia/backend/venv/bin/activate
 
-celery -A backend.celery worker -l info
+screen celery -A backend.celery worker -l info

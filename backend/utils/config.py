@@ -6,7 +6,7 @@ redis_url = 'aliyun.yawujia.cn'
 cache_one_day = 86400
 mysql_user = 'root'
 mysql_password = 'root'
-city_max_page = 500
+city_default_max_page = 500
 
 city_dict_key = 'city_dict_v1'
 ershoufang_city_house_urls_key = 'ershoufang_city_house_urls_v1'
