@@ -33,6 +33,7 @@ class ErShouFangCrawler(LianjiaCrawler):
 
     # 获取一个城市的所有二手房房源 url
     def get_total_page(self, city_url):
+        return 50
         city_url = self.ershoufang_pattern.format(city_url, 1)
         response = requests.get(city_url, headers=self.headers)
         try:
