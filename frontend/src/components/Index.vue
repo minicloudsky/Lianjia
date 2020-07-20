@@ -25,7 +25,12 @@
                 </el-menu>
             </el-header>
             <el-aside width="200px">Aside</el-aside>
-            <el-main>Main</el-main>
+            <el-main>
+                <div class="el-card">
+                    <el-button type="primary" round @click="crawl">开始爬取二手房</el-button>
+                </div>
+
+            </el-main>
             <el-footer>Footer</el-footer>
         </el-container>
     </div>
@@ -34,12 +39,27 @@
 <script>
     export default {
         name: "Index",
+        data: function () {
+            return {
+                task: '',
+            };
+        },
         methods: {
             handleOpen(key, keyPath) {
                 console.log(key, keyPath);
             },
             handleClose(key, keyPath) {
                 console.log(key, keyPath);
+            },
+            crawl() {
+                let data = {}
+                this.$get('/task/create/', data).then(res => {
+                    this.loading = false;
+                    if (res.data) {
+                        this.task = res.data.msg
+                    }
+                    alert(this.task)
+                });
             }
         },
         mounted() {

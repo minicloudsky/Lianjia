@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'newhouse',
     'statistic',
     'rest_framework',
+    'taskschedule'
 ]
 
 MIDDLEWARE = [
