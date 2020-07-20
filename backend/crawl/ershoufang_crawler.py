@@ -143,3 +143,4 @@ class ErShouFangCrawler(LianjiaCrawler):
             statistic['cost_time'] = str(statistic['end_time'] - statistic['start_time'])
             Statistic.objects.create(**statistic)
         logger.info("finish city {}".format(city))
+

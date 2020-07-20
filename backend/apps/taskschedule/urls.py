@@ -23,3 +23,4 @@ urlpatterns = [
     path('update/', views.TaskScheduleView.as_view({'post': 'update'})),
 
 ]
+

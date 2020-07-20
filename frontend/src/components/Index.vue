@@ -106,4 +106,5 @@
     .menu {
         margin-left: 30%;
     }
+
 </style>
