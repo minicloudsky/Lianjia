@@ -32,3 +32,4 @@ class TaskScheduleView(mixins.CreateModelMixin, mixins.UpdateModelMixin, Generic
         self.perform_update(serializer)
 
         return Response(serializer.data)
+
