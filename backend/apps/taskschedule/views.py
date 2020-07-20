@@ -3,13 +3,14 @@ from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-
+from rest_framework import status
 from taskschedule.serializers import TaskScheduleSerializer
 from taskschedule.models import Task
+from taskschedule.tasks import crawl_ershoufang
 
 
 class TaskScheduleView(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericViewSet):
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = []
     serializer_class = TaskScheduleSerializer
     queryset = Task.objects.all()
 
@@ -19,7 +20,9 @@ class TaskScheduleView(mixins.CreateModelMixin, mixins.UpdateModelMixin, Generic
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        return super(TaskScheduleView, self).create(request, *args, **kwargs)
+        crawl = crawl_ershoufang()
+        return Response(data={'code': 1, 'msg': '二手房爬虫创建成功'}, status=status)
+        # return super(TaskScheduleView, self).create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)

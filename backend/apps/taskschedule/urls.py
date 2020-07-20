@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from taskschedule import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('create/', views.TaskScheduleView.as_view({'get': 'create'})),
+    path('list/', views.TaskScheduleView.as_view({'get': 'list'})),
+    path('update/', views.TaskScheduleView.as_view({'post': 'update'})),
+
 ]
