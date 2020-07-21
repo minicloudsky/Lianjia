@@ -26,11 +26,11 @@ class ErShouFangCrawler(LianjiaCrawler):
                 page_url_ids = self.get_per_page_house_url(city_url, page)
                 house_url_ids = house_url_ids + page_url_ids
             house_url_ids = list(set(house_url_ids))
-            city_house_urls = ['https://m.lianjia.com/{}/ershoufang/{}.html'.format(city_url, id) for id in
+            city_house_urls = [ershoufang_house_urls_pattern.format(city_url, id) for id in
                                house_url_ids]
             self.ershoufang_all_house_urls[city] = city_house_urls
-            redis_connection.set(city_house_urls_key, json.dumps({city: city_house_urls}),
-                                 cache_one_day)
+            redis_connection.set(city_house_urls_key.format(city),
+                                 json.dumps({city: city_house_urls}), cache_one_day)
             self.get_city_house_data(city, city_house_urls)
         redis_connection.set(ershoufang_city_house_urls_key,
                              json.dumps(self.ershoufang_all_house_urls), cache_one_day)
@@ -53,7 +53,8 @@ class ErShouFangCrawler(LianjiaCrawler):
 
     # 获取一个城市的单页二手房房源 url
     def get_per_page_house_url(self, city_url, page):
-        response = requests.get(self.ershoufang_pattern.format(city_url, page), headers=self.headers)
+        response = requests.get(self.ershoufang_pattern.format(city_url, page),
+                                headers=self.headers)
         url_ids = re.findall(re.compile('<a href="https://m.lianjia.com/{}/ershoufang/(.+?).html"'.format(city_url)),
                              response.text)
         return url_ids
@@ -93,7 +94,7 @@ class ErShouFangCrawler(LianjiaCrawler):
                             kwargs['detail'] = detail if detail else {'detail': 'empty'}
                     except:
                         logger.warning("parse house detail error .")
-                        kwargs['detail'] = ""
+                        kwargs['detail'] = {'detail': 'empty'}
                         pass
                 kwargs['unit_price'] = parser.match_positive_number(data[0][1]) if data[0][1] else -1
                 upload_time = data[1][1] if data[1][1] else ''
@@ -145,4 +146,3 @@ class ErShouFangCrawler(LianjiaCrawler):
         statistic['cost_time'] = str(statistic['end_time'] - statistic['start_time'])
         Statistic.objects.create(**statistic)
         logger.info("finish city {}".format(city))
-

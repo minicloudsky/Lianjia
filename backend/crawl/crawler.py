@@ -14,8 +14,6 @@ class LianjiaCrawler:
     get_all_city_url = 'https://m.lianjia.com/city/'
     city_url_pattern = 'https://m.lianjia.com/{}/'
     ershoufang_pattern = 'https://m.lianjia.com/{}/ershoufang/index/pg{}/'
-    newhouse_pattern = 'https://m.lianjia.com/{}/loupan/fang/'
-    zufang_pattern = 'https://m.lianjia.com/chuzu/{}/zufang/'
     city_dict = {}
 
     def __init__(self):
