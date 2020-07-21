@@ -30,4 +30,3 @@ class LianjiaCrawler:
         for city in citys:
             self.city_dict[city[1]] = city[0]
         redis_connection.set(city_dict_key, json.dumps(self.city_dict), cache_one_day)
-
