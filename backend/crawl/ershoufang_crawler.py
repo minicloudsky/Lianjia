@@ -8,6 +8,9 @@ from crawl.crawler import LianjiaCrawler
 from ershoufang.models import ErShouFang
 from utils.html_perser_tools import CloudSkyHtmlParser
 from statistic.models import Statistic
+from multiprocessing import Pool, cpu_count
+import os
+import time
 
 
 class ErShouFangCrawler(LianjiaCrawler):
@@ -18,23 +21,33 @@ class ErShouFangCrawler(LianjiaCrawler):
         print("start crawling ershoufang")
         redis_connection = get_redis_conn()
         logger.info("city_dict {}".format(self.city_dict))
+        process_pool = Pool(len(self.city_dict) + 1)
         for city, city_url in self.city_dict.items():
-            logger.info("crawling {} {}".format(city, city_url))
-            house_url_ids = []
-            total_page = self.get_total_page(city_url)
-            for page in range(1, total_page + 1):
-                page_url_ids = self.get_per_page_house_url(city_url, page)
-                house_url_ids = house_url_ids + page_url_ids
-            house_url_ids = list(set(house_url_ids))
-            city_house_urls = [ershoufang_house_urls_pattern.format(city_url, id) for id in
-                               house_url_ids]
-            self.ershoufang_all_house_urls[city] = city_house_urls
-            redis_connection.set(city_house_urls_key.format(city),
-                                 json.dumps({city: city_house_urls}), cache_one_day)
-            self.get_city_house_data(city, city_house_urls)
+            process_pool.apply_async(self.get_city_ershoufang, args=(city, city_url,))
+        print('等待所有爬虫子进程完成。')
+        process_pool.close()
+        process_pool.join()
         redis_connection.set(ershoufang_city_house_urls_key,
                              json.dumps(self.ershoufang_all_house_urls), cache_one_day)
         logger.info("finish crawl ershoufang .")
+
+    # 开启多进程，每个城市开启一个进程进行抓取
+    def get_city_ershoufang(self, city, city_url):
+        redis_connection = get_redis_conn()
+        print("子进程: {},任务: {},当前时间: {}".format(os.getpid(), city, time.time()))
+        logger.info("crawling {} {}".format(city, city_url))
+        house_url_ids = []
+        total_page = self.get_total_page(city_url)
+        for page in range(1, total_page + 1):
+            page_url_ids = self.get_per_page_house_url(city_url, page)
+            house_url_ids = house_url_ids + page_url_ids
+        house_url_ids = list(set(house_url_ids))
+        city_house_urls = [ershoufang_house_urls_pattern.format(city_url, id) for id in
+                           house_url_ids]
+        self.ershoufang_all_house_urls[city] = city_house_urls
+        redis_connection.set(city_house_urls_key.format(city),
+                             json.dumps({city: city_house_urls}), cache_one_day)
+        self.get_city_house_data(city, city_house_urls)
 
     # 获取城市二手房数据总页数
     def get_total_page(self, city_url):
