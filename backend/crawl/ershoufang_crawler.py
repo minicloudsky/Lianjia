@@ -21,6 +21,7 @@ class ErShouFangCrawler(LianjiaCrawler):
         super().__init__()
         print("start crawling ershoufang")
         redis_connection = get_redis_conn()
+        print(self.city_dict)
         process_pool = Pool(len(self.city_dict) + 1)
         for city, city_url in self.city_dict.items():
             process_pool.apply_async(self.get_city_ershoufang, args=(city, city_url,))
