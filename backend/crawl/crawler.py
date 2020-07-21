@@ -21,7 +21,7 @@ class LianjiaCrawler:
 
     def get_citys(self):
         redis_connection = get_redis_conn()
-        if redis_connection.get(city_dict_key):
+        if json.loads(redis_connection.get(city_dict_key)):
             city_dict = json.loads(redis_connection.get(city_dict_key))
             self.city_dict = city_dict
         response = requests.get(self.get_all_city_url, headers=self.headers)
