@@ -6,13 +6,14 @@ from django_mysql.models import JSONField
 
 # Create your models here.
 class ErShouFang(BaseModel):
-    house_url = models.CharField('房源url', max_length=500, null=False, blank=False)
+    house_url_id = models.CharField('房源url_id', max_length=100, null=False, blank=False)
+    city_url_id = models.CharField('城市url_id', max_length=20, null=False, blank=False)
     city = models.CharField('房源所在城市', max_length=100, null=True, blank=True)
     name = models.CharField('房源名称', max_length=500, null=True, blank=True)
     total_price = models.FloatField('总价', default=0)
     unit_type = models.CharField('房型', max_length=200, null=True, blank=True)
     square = models.FloatField('面积', default=0)
-    #
+    # 详情
     detail = JSONField()
     unit_price = models.FloatField('单价', default=0)
     upload_time = models.DateTimeField('房源挂牌时间', blank=True, null=True)
