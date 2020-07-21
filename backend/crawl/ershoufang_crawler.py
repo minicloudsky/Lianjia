@@ -63,6 +63,7 @@ class ErShouFangCrawler(LianjiaCrawler):
         parser = CloudSkyHtmlParser()
         logger.info("crawling {} .".format(city))
         statistic = {'start_time': datetime.datetime.now()}
+        city_house_list = []
         for house_url in city_house_urls:
             try:
                 selector_class_names = ['detail_title', 'similar_data',
@@ -133,14 +134,15 @@ class ErShouFangCrawler(LianjiaCrawler):
                 img_class_names = ['vr_box', 'box_col']
                 img_data = parser.get_img_by_class_name(response.text, img_class_names)
                 kwargs['img_url'] = img_data[0] if img_data else ''
-                ErShouFang.objects.create(**kwargs)
+                city_house_list.append(ErShouFang(**kwargs))
             except Exception:
                 logger.warning("key error .")
-            statistic['end_time'] = datetime.datetime.now()
-            statistic['total'] = len(city_house_urls)
-            statistic['city'] = city
-            statistic['type'] = 'ershoufang'
-            statistic['cost_time'] = str(statistic['end_time'] - statistic['start_time'])
-            Statistic.objects.create(**statistic)
+        ErShouFang.objects.bulk_create(city_house_list)
+        statistic['end_time'] = datetime.datetime.now()
+        statistic['total'] = len(city_house_urls)
+        statistic['city'] = city
+        statistic['type'] = 'ershoufang'
+        statistic['cost_time'] = str(statistic['end_time'] - statistic['start_time'])
+        Statistic.objects.create(**statistic)
         logger.info("finish city {}".format(city))
 
