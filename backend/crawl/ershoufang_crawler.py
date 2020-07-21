@@ -1,16 +1,17 @@
+import datetime
 import json
+import os
 import re
 import time
+from multiprocessing import Pool
+
 import requests
-import datetime
+
 from config import *
 from crawl.crawler import LianjiaCrawler
 from ershoufang.models import ErShouFang
-from utils.html_perser_tools import CloudSkyHtmlParser
 from statistic.models import Statistic
-from multiprocessing import Pool, cpu_count
-import os
-import time
+from utils.html_perser_tools import CloudSkyHtmlParser
 
 
 class ErShouFangCrawler(LianjiaCrawler):
@@ -20,7 +21,6 @@ class ErShouFangCrawler(LianjiaCrawler):
         super().__init__()
         print("start crawling ershoufang")
         redis_connection = get_redis_conn()
-        logger.info("city_dict {}".format(self.city_dict))
         process_pool = Pool(len(self.city_dict) + 1)
         for city, city_url in self.city_dict.items():
             process_pool.apply_async(self.get_city_ershoufang, args=(city, city_url,))
@@ -34,8 +34,8 @@ class ErShouFangCrawler(LianjiaCrawler):
     # 开启多进程，每个城市开启一个进程进行抓取
     def get_city_ershoufang(self, city, city_url):
         redis_connection = get_redis_conn()
-        print("子进程: {},任务: {},当前时间: {}".format(os.getpid(), city, time.time()))
-        logger.info("crawling {} {}".format(city, city_url))
+        logger.info("crawling {}  子进程: {},任务: {},当前时间: {}".format(city, os.getpid(),
+                                                                  city_url, datetime.datetime.now()))
         house_url_ids = []
         total_page = self.get_total_page(city_url)
         for page in range(1, total_page + 1):
@@ -61,7 +61,7 @@ class ErShouFangCrawler(LianjiaCrawler):
                 return int(int(page) / 30) + 1
             return city_default_max_page
         except Exception:
-            logger.warning("get city_max_page error !")
+            logger.warning("进程: {} get city_max_page error !".format(os.getpid()))
             return city_default_max_page
 
     # 获取一个城市的单页二手房房源 url
@@ -75,7 +75,7 @@ class ErShouFangCrawler(LianjiaCrawler):
     # 爬取一个城市的二手房数据
     def get_city_house_data(self, city, city_house_urls):
         parser = CloudSkyHtmlParser()
-        logger.info("crawling {} .".format(city))
+        logger.info("任务: {} 进程: {} crawling  .".format(city, os.getpid()))
         statistic = {'start_time': datetime.datetime.now()}
         city_house_list = []
         for house_url in city_house_urls:
@@ -106,7 +106,7 @@ class ErShouFangCrawler(LianjiaCrawler):
                             detail[x[0]] = x[1]
                             kwargs['detail'] = detail if detail else {'detail': 'empty'}
                     except:
-                        logger.warning("parse house detail error .")
+                        logger.warning("{} parse house detail error .".format(os.getpid()))
                         kwargs['detail'] = {'detail': 'empty'}
                         pass
                 kwargs['unit_price'] = parser.match_positive_number(data[0][1]) if data[0][1] else -1
@@ -134,7 +134,7 @@ class ErShouFangCrawler(LianjiaCrawler):
                             room_info[x[0]] = x[1]
                             kwargs['room_info'] = room_info if room_info else {"room_info": "empty"}
                     except Exception:
-                        logger.warning("room_info parse error .")
+                        logger.warning("进程: {} room_info parse error .".format(os.getpid()))
                         kwargs['room_info'] = ""
                         pass
                 kwargs['introduction'] = per_house[4].strip()
@@ -150,7 +150,7 @@ class ErShouFangCrawler(LianjiaCrawler):
                 kwargs['img_url'] = img_data[0] if img_data else ''
                 city_house_list.append(ErShouFang(**kwargs))
             except Exception:
-                logger.warning("key error .")
+                logger.warning("进程: {} key error .".format(os.getpid()))
         ErShouFang.objects.bulk_create(city_house_list)
         statistic['end_time'] = datetime.datetime.now()
         statistic['total'] = len(city_house_urls)
@@ -158,4 +158,4 @@ class ErShouFangCrawler(LianjiaCrawler):
         statistic['type'] = 'ershoufang'
         statistic['cost_time'] = str(statistic['end_time'] - statistic['start_time'])
         Statistic.objects.create(**statistic)
-        logger.info("finish city {}".format(city))
+        logger.info("任务: {} 进程: {} finish .".format(city, os.getpid()))
