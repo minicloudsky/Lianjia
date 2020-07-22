@@ -22,15 +22,26 @@ class ErShouFangCrawler(LianjiaCrawler):
         print("start crawling ershoufang")
         redis_connection = get_redis_conn()
         print(self.city_dict)
-        process_pool = Pool(len(self.city_dict) + 1)
+        count = 0
+        temp_dict = {}
+        process_pool = Pool(int(len(self.city_dict.keys()) / 10) + 1)
         for city, city_url in self.city_dict.items():
-            process_pool.apply_async(self.get_city_ershoufang, args=(city, city_url,))
-        print('等待所有爬虫子进程完成。')
+            temp_dict[city] = city_url
+            count += 1
+            if count % 10 == 0:
+                process_pool.apply_async(self.get_process_houses, args=(temp_dict,))
+                temp_dict = {}
         process_pool.close()
         process_pool.join()
+        print('等待所有爬虫子进程完成。')
+
         redis_connection.set(ershoufang_city_house_urls_key,
                              json.dumps(self.ershoufang_all_house_urls), cache_one_day)
         logger.info("finish crawl ershoufang .")
+
+    def get_process_houses(self, process_city_dict):
+        for city, city_url in process_city_dict.items():
+            self.get_city_ershoufang(city, city_url)
 
     # 开启多进程，每个城市开启一个进程进行抓取
     def get_city_ershoufang(self, city, city_url):
