@@ -160,6 +160,7 @@ class ErShouFangCrawler(LianjiaCrawler):
                 img_class_names = ['vr_box', 'box_col']
                 img_data = parser.get_img_by_class_name(response.text, img_class_names)
                 kwargs['img_url'] = img_data[0] if img_data else ''
+                print(kwargs)
                 city_house_list.append(ErShouFang(**kwargs))
             except Exception:
                 logger.warning("进程: {} key error .".format(os.getpid()))
