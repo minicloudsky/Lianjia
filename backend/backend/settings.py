@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'user',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -45,7 +46,7 @@ INSTALLED_APPS = [
     'newhouse',
     'statistic',
     'rest_framework',
-    'taskschedule'
+    'taskschedule',
 ]
 
 MIDDLEWARE = [
@@ -195,3 +196,20 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
+AUTH_USER_MODEL = 'user.User'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# 邮件配置信息
+EMAIL_USE_SSL = True
+
+# 邮件服务器， 如果是163邮箱就改成smtp.163.com
+EMAIL_HOST = ‘smtp.qq.com’
+
+# 邮件服务的端口
+EMAIL_PORT = 465
+
+# 发送邮件的账号，也就是前面你开启服务的邮箱号
+EMAIL_HOST_USER = 'admin@admin.com'
+
+# SMTP服务密码
+EMAIL_HOST_PASSWORD = ‘xxxxxx’
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
