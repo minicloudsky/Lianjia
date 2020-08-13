@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'statistic',
     'rest_framework',
     'taskschedule',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -213,3 +215,7 @@ EMAIL_HOST_USER = 'admin@admin.com'
 # SMTP服务密码
 EMAIL_HOST_PASSWORD = ‘xxxxxx’
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# 跨域请求
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True

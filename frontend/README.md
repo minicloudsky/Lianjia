@@ -1,6 +1,6 @@
 # frontend
 
-> A Vue.js project
+> A vue.js frontend for lianjia crawler.
 
 ## Build Setup
 
