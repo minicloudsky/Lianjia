@@ -21,7 +21,7 @@ class LianjiaCrawler:
 
     def get_citys(self):
         redis_connection = get_redis_conn()
-        if json.loads(redis_connection.get(city_dict_key)):
+        if redis_connection.get(city_dict_key) and json.loads(redis_connection.get(city_dict_key)):
             city_dict = json.loads(redis_connection.get(city_dict_key))
             self.city_dict = city_dict
         response = requests.get(self.get_all_city_url, headers=self.headers)
@@ -29,4 +29,5 @@ class LianjiaCrawler:
                            response.text)
         for city in citys:
             self.city_dict[city[1]] = city[0]
-        redis_connection.set(city_dict_key, json.dumps(self.city_dict), cache_one_day)
+        redis_connection.set(city_dict_key, json.dumps(
+            self.city_dict), cache_one_day)

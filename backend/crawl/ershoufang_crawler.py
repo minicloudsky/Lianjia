@@ -29,7 +29,8 @@ class ErShouFangCrawler(LianjiaCrawler):
             temp_dict[city] = city_url
             count += 1
             if count % 10 == 0:
-                process_pool.apply_async(self.get_process_houses, args=(temp_dict,))
+                process_pool.apply_async(
+                    self.get_process_houses, args=(temp_dict,))
                 temp_dict = {}
         process_pool.close()
         process_pool.join()
@@ -73,7 +74,8 @@ class ErShouFangCrawler(LianjiaCrawler):
                 return int(int(page) / 30) + 1
             return city_default_max_page
         except Exception:
-            logger.warning("进程: {} get city_max_page error !".format(os.getpid()))
+            logger.warning(
+                "进程: {} get city_max_page error !".format(os.getpid()))
             return city_default_max_page
 
     # 获取一个城市的单页二手房房源 url
@@ -99,29 +101,36 @@ class ErShouFangCrawler(LianjiaCrawler):
                                         'map_marker', 'haofang-wrap']
                 response = requests.get(house_url, headers=self.headers)
                 kwargs = {'house_url': house_url, 'city': city}
-                per_house = parser.get_texts_by_class_name(response.text, selector_class_names)
+                per_house = parser.get_texts_by_class_name(
+                    response.text, selector_class_names)
                 if per_house:
                     kwargs['name'] = per_house[0]
                     data = per_house[1].split('\n')
                     if '万' in data[0]:
-                        kwargs['total_price'] = parser.match_positive_number(data[0]) * 10000
+                        kwargs['total_price'] = parser.match_positive_number(
+                            data[0]) * 10000
                     else:
-                        kwargs['total_price'] = parser.match_positive_number(data[0])
-                    kwargs['unit_type'] = data[1].replace('房型', '') if data[1] else ''
+                        kwargs['total_price'] = parser.match_positive_number(
+                            data[0])
+                    kwargs['unit_type'] = data[1].replace(
+                        '房型', '') if data[1] else ''
                     kwargs['square'] = parser.match_positive_number(data[2]) if data[2] and (
-                            'm²' or '面积' in data[2]) else ''
+                        'm²' or '面积' in data[2]) else ''
                 data = [x.split('：') for x in per_house[2].strip().split('\n')]
                 detail = {}
                 for x in data:
                     try:
                         if x and x[0] and x[1]:
                             detail[x[0]] = x[1]
-                            kwargs['detail'] = detail if detail else {'detail': 'empty'}
+                            kwargs['detail'] = detail if detail else {
+                                'detail': 'empty'}
                     except:
-                        logger.warning("{} parse house detail error .".format(os.getpid()))
+                        # logger.warning(
+                        #     "{} {} parse house detail error .".format(house_url, os.getpid()))
                         kwargs['detail'] = {'detail': 'empty'}
                         pass
-                kwargs['unit_price'] = parser.match_positive_number(data[0][1]) if data[0][1] else -1
+                kwargs['unit_price'] = parser.match_positive_number(
+                    data[0][1]) if data[0][1] else -1
                 upload_time = data[1][1] if data[1][1] else ''
                 upload_time_list = upload_time.split('.')
                 if len(upload_time_list) == 3:
@@ -144,9 +153,11 @@ class ErShouFangCrawler(LianjiaCrawler):
                     try:
                         if x and x[0] and x[1]:
                             room_info[x[0]] = x[1]
-                            kwargs['room_info'] = room_info if room_info else {"room_info": "empty"}
+                            kwargs['room_info'] = room_info if room_info else {
+                                "room_info": "empty"}
                     except Exception:
-                        logger.warning("进程: {} room_info parse error .".format(os.getpid()))
+                        # logger.warning(
+                        #     "{} 进程: {} room_info parse error .".format(house_url, os.getpid()))
                         kwargs['room_info'] = ""
                         pass
                 kwargs['introduction'] = per_house[4].strip()
@@ -158,17 +169,24 @@ class ErShouFangCrawler(LianjiaCrawler):
                 kwargs['position'] = per_house[7]
                 kwargs['highlight'] = per_house[8].replace('好房亮点', '').strip()
                 img_class_names = ['vr_box', 'box_col']
-                img_data = parser.get_img_by_class_name(response.text, img_class_names)
+                img_data = parser.get_img_by_class_name(
+                    response.text, img_class_names)
                 kwargs['img_url'] = img_data[0] if img_data else ''
-                print(kwargs)
-                city_house_list.append(ErShouFang(**kwargs))
+                city_house_list.append(ErShouFang(ErShouFang(**kwargs)))
+                logger.info(ErShouFang.objects.create(city_house_list))
+                logger.info("-------二手房-", ErShouFang(**kwargs))
             except Exception:
-                logger.warning("进程: {} key error .".format(os.getpid()))
+                # logger.warning("{} 进程: {} key error .".format(
+                #     house_url, os.getpid()))
+                pass
+        logger.info("{}一共有 {} 套二手房源".format(city, len(city_house_list)))
         ErShouFang.objects.bulk_create(city_house_list)
+        logger.info("{} 房源插入成功".format(city))
         statistic['end_time'] = datetime.datetime.now()
         statistic['total'] = len(city_house_urls)
         statistic['city'] = city
         statistic['type'] = 'ershoufang'
-        statistic['cost_time'] = str(statistic['end_time'] - statistic['start_time'])
+        statistic['cost_time'] = str(
+            statistic['end_time'] - statistic['start_time'])
         Statistic.objects.create(**statistic)
         logger.info("任务: {} 进程: {} finish .".format(city, os.getpid()))

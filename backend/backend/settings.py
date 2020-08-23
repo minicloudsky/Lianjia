@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'statistic',
     'rest_framework',
     'taskschedule',
-    'corsheaders',
+    # 'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -204,17 +204,17 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_SSL = True
 
 # 邮件服务器， 如果是163邮箱就改成smtp.163.com
-EMAIL_HOST = ‘smtp.qq.com’
+# EMAIL_HOST = ‘smtp.qq.com’
 
 # 邮件服务的端口
-EMAIL_PORT = 465
+#EMAIL_PORT = 465
 
 # 发送邮件的账号，也就是前面你开启服务的邮箱号
-EMAIL_HOST_USER = 'admin@admin.com'
+#EMAIL_HOST_USER = 'admin@admin.com'
 
 # SMTP服务密码
-EMAIL_HOST_PASSWORD = ‘xxxxxx’
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# EMAIL_HOST_PASSWORD = ‘xxxxxx’
+#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # 跨域请求
 CORS_ORIGIN_ALLOW_ALL = True
