@@ -19,7 +19,7 @@ module.exports = {
           '^/apis': ''   //需要rewrite的,
         }
       }
-    }
+    },
 
     // Various Dev Server settings
     host: '0.0.0.0', // can be overwritten by process.env.HOST
