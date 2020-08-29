@@ -52,6 +52,7 @@ class ErShouFangCrawler(LianjiaCrawler):
         for page in range(1, total_page + 1):
             page_url_ids = self.get_per_page_house_url(city_url, page)
             house_url_ids = house_url_ids + page_url_ids
+            print("getting page: {}".format(page))
         house_url_ids = list(set(house_url_ids))
         logger.info(" {} total house urls: {}.".format(city,len(house_url_ids)))
         city_house_urls = [ershoufang_house_urls_pattern.format(city_url, id) for id in
@@ -108,8 +109,7 @@ class ErShouFangCrawler(LianjiaCrawler):
                 else:
                     kwargs['total_price'] = parser.match_positive_number(
                         data[0])
-                kwargs['unit_type'] = data[1].replace(
-                    '房型', '') if data and data[1] else ''
+                kwargs['unit_type'] = data[1].replace('房型', '') if data and len(data)>=1 else ''
                 kwargs['square'] = parser.match_positive_number(data[2]) if data[2] and (
                         'm²' or '面积' in data[2]) else ''
             data = [x.split('：') for x in per_house[2].strip().split('\n')]
