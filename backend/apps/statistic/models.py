@@ -1,5 +1,5 @@
 from django.db import models
-from backend.utils.model import BaseModel
+from utils.model import BaseModel
 
 
 # Create your models here.

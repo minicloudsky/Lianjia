@@ -1,6 +1,6 @@
 from django.db import models
 
-from backend.utils.model import BaseModel
+from utils.model import BaseModel
 from django_mysql.models import JSONField
 
 
