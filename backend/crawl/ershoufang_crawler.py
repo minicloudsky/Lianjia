@@ -170,6 +170,7 @@ class ErShouFangCrawler(LianjiaCrawler):
                 kwargs['img_url'] = img_data[0] if img_data else ''
             except Exception as e:
                 logger.warn("----parse html error {}".format(e))
+                pass
             city_house_list.append(ErShouFang(**kwargs))
             logger.info("-------二手房-", ErShouFang(**kwargs))
         logger.info("{}一共有 {} 套二手房源".format(city, len(city_house_list)))
