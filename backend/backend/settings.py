@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     "default": {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'huaweicloud.yawujia.cn',
+        'HOST': 'aliyun.yawujia.cn',
         'PORT': 3306,
         'USER': 'root',
         'PASSWORD': 'root',

@@ -4,14 +4,12 @@ import os
 import re
 import time
 from multiprocessing import Pool
-
 import requests
-
 from config import *
-from backend.crawl.crawler import LianjiaCrawler
+from crawl.crawler import LianjiaCrawler
 from ershoufang.models import ErShouFang
 from statistic.models import Statistic
-from backend.utils.html_perser_tools import CloudSkyHtmlParser
+from utils.html_perser_tools import CloudSkyHtmlParser
 
 
 class ErShouFangCrawler(LianjiaCrawler):
@@ -26,15 +24,16 @@ class ErShouFangCrawler(LianjiaCrawler):
         temp_dict = {}
         process_pool = Pool(int(len(self.city_dict.keys()) / 10) + 1)
         for city, city_url in self.city_dict.items():
-            temp_dict[city] = city_url
-            count += 1
-            if count % 10 == 0:
-                process_pool.apply_async(
-                    self.get_process_houses, args=(temp_dict,))
-                temp_dict = {}
-        process_pool.close()
-        process_pool.join()
-        print('等待所有爬虫子进程完成。')
+            # temp_dict[city] = city_url
+            # count += 1
+            # if count % 10 == 0:
+            #     process_pool.apply_async(
+            #         self.get_process_houses, args=(temp_dict,))
+            #     temp_dict = {}
+            self.get_city_ershoufang(city, city_url)
+        # process_pool.close()
+        # process_pool.join()
+        # print('等待所有爬虫子进程完成。')
 
         redis_connection.set(ershoufang_city_house_urls_key,
                              json.dumps(self.ershoufang_all_house_urls), cache_one_day)
@@ -47,20 +46,21 @@ class ErShouFangCrawler(LianjiaCrawler):
     # 开启多进程，每个城市开启一个进程进行抓取
     def get_city_ershoufang(self, city, city_url):
         redis_connection = get_redis_conn()
-        logger.info("crawling {}  子进程: {},任务: {},当前时间: {}".format(city, os.getpid(),
-                                                                  city_url, datetime.datetime.now()))
         house_url_ids = []
         total_page = self.get_total_page(city_url)
+        logger.info("start get {} house url.".format(city))
         for page in range(1, total_page + 1):
             page_url_ids = self.get_per_page_house_url(city_url, page)
             house_url_ids = house_url_ids + page_url_ids
+            print("getting page: {}".format(page))
         house_url_ids = list(set(house_url_ids))
+        logger.info(" {} total house urls: {}.".format(city, len(house_url_ids)))
         city_house_urls = [ershoufang_house_urls_pattern.format(city_url, id) for id in
                            house_url_ids]
         self.ershoufang_all_house_urls[city] = city_house_urls
         redis_connection.set(city_house_urls_key.format(city),
                              json.dumps({city: city_house_urls}), cache_one_day)
-        self.get_city_house_data(city, city_house_urls)
+        self.get_city_house_data(city, house_url_ids)
 
     # 获取城市二手房数据总页数
     def get_total_page(self, city_url):
@@ -74,8 +74,6 @@ class ErShouFangCrawler(LianjiaCrawler):
                 return int(int(page) / 30) + 1
             return city_default_max_page
         except Exception:
-            logger.warning(
-                "进程: {} get city_max_page error !".format(os.getpid()))
             return city_default_max_page
 
     # 获取一个城市的单页二手房房源 url
@@ -86,19 +84,19 @@ class ErShouFangCrawler(LianjiaCrawler):
         return url_ids
 
     # 爬取一个城市的二手房数据
-    def get_city_house_data(self, city, city_house_urls):
+    def get_city_house_data(self, city, house_url_ids):
         parser = CloudSkyHtmlParser()
         logger.info("任务: {} 进程: {} crawling  .".format(city, os.getpid()))
         statistic = {'start_time': datetime.datetime.now()}
         city_house_list = []
-        for house_url in city_house_urls:
+        for house_url_id in house_url_ids:
             selector_class_names = ['detail_title', 'similar_data',
                                     'house_description big lightblack lazyload_ulog',
                                     'item_list', 'mod_cont fiveline house_intro_mod_cont',
                                     'mod_box house_record', 'info_layer',
                                     'map_marker', 'haofang-wrap']
-            response = self.request(house_url)
-            kwargs = {'house_url': house_url, 'city': city}
+            response = self.request(ershoufang_house_urls_pattern.format(house_url_id, id))
+            kwargs = {'house_url_id': house_url_id, 'city': city}
             per_house = parser.get_texts_by_class_name(
                 response.text, selector_class_names)
             if per_house:
@@ -110,8 +108,7 @@ class ErShouFangCrawler(LianjiaCrawler):
                 else:
                     kwargs['total_price'] = parser.match_positive_number(
                         data[0])
-                kwargs['unit_type'] = data[1].replace(
-                    '房型', '') if data[1] else ''
+                kwargs['unit_type'] = data[1].replace('房型', '') if data and len(data) >= 1 else ''
                 kwargs['square'] = parser.match_positive_number(data[2]) if data[2] and (
                         'm²' or '面积' in data[2]) else ''
             data = [x.split('：') for x in per_house[2].strip().split('\n')]
@@ -177,7 +174,7 @@ class ErShouFangCrawler(LianjiaCrawler):
         ErShouFang.objects.bulk_create(city_house_list)
         logger.info("{} 房源插入成功".format(city))
         statistic['end_time'] = datetime.datetime.now()
-        statistic['total'] = len(city_house_urls)
+        statistic['total'] = len(house_url_ids)
         statistic['city'] = city
         statistic['type'] = 'ershoufang'
         statistic['cost_time'] = str(
