@@ -156,24 +156,26 @@ class ErShouFangCrawler(LianjiaCrawler):
                         #     "{} 进程: {} room_info parse error .".format(house_url, os.getpid()))
                         kwargs['room_info'] = ""
                         pass
-                kwargs['introduction'] = per_house[4].strip()
+                kwargs['introduction'] = per_house[4].strip() if per_house[4] else ''
                 if per_house[5] and '房源动态' in per_house[5]:
                     kwargs['trends'] = per_house[5].replace('\n', '')
                 else:
                     kwargs['trends'] = per_house[5]
-                kwargs['basic_attributes'] = per_house[6]
-                kwargs['position'] = per_house[7]
-                kwargs['highlight'] = per_house[8].replace('好房亮点', '').strip()
+                kwargs['basic_attributes'] = per_house[6] if per_house[6] else ''
+                kwargs['position'] = per_house[7] if per_house[7] else ''
+                kwargs['highlight'] = per_house[8].replace('好房亮点', '').strip() if per_house[8] else ''
                 img_class_names = ['vr_box', 'box_col']
                 img_data = parser.get_img_by_class_name(
                     response.text, img_class_names)
                 kwargs['img_url'] = img_data[0] if img_data else ''
             except Exception as e:
                 logger.warn("----parse html error {}".format(e))
-            city_house_list.append(ErShouFang(**kwargs))
-            logger.info("-------二手房-", ErShouFang(**kwargs))
+                pass
+            logger.info("------**kwargs {}".format(kwargs))
+            ErShouFang.objects.create(**kwargs)
+            # city_house_list.append(ErShouFang(**kwargs))
         logger.info("{}一共有 {} 套二手房源".format(city, len(city_house_list)))
-        ErShouFang.objects.bulk_create(city_house_list)
+        # ErShouFang.objects.bulk_create(city_house_list)
         logger.info("{} 房源插入成功".format(city))
         statistic['end_time'] = datetime.datetime.now()
         statistic['total'] = len(house_url_ids)
