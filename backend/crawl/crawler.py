@@ -53,6 +53,6 @@ class LianjiaCrawler:
             self.city_dict), cache_one_day)
 
     def request(self, url):
-        self.headers['User-Agent'] = self.useragents[random.randint(0, len(self.useragents) - 1)]
+        self.headers['User-Agent'] = self.useragents[random.randint(0, len(self.useragents) - 1)]['User-Agent']
         response = requests.get(url, headers=self.headers)
         return response

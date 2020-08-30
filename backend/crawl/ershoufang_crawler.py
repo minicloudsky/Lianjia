@@ -100,16 +100,16 @@ class ErShouFangCrawler(LianjiaCrawler):
             per_house = parser.get_texts_by_class_name(
                 response.text, selector_class_names)
             if per_house:
-                kwargs['name'] = per_house[0]
-                data = per_house[1].split('\n')
+                kwargs['name'] = per_house[0] if per_house[0] else ''
+                data = per_house[1].split('\n') if per_house[1] else ''
                 if '万' in data[0]:
                     kwargs['total_price'] = parser.match_positive_number(
-                        data[0]) * 10000
+                        data[0] if data[0] else -1) * 10000
                 else:
                     kwargs['total_price'] = parser.match_positive_number(
-                        data[0])
-                kwargs['unit_type'] = data[1].replace('房型', '') if data and len(data) >= 1 else ''
-                kwargs['square'] = parser.match_positive_number(data[2]) if data[2] and (
+                        data[0] if data[0] else -1)
+                kwargs['unit_type'] = data[1].replace('房型', '') if data and len(data) >= 2 else ''
+                kwargs['square'] = parser.match_positive_number(data[2] if len(data) >= 2 else "") if data[2] and (
                         'm²' or '面积' in data[2]) else ''
             data = [x.split('：') for x in per_house[2].strip().split('\n')]
             detail = {}
