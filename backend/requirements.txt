@@ -41,6 +41,7 @@ pyppeteer==0.2.2
 pytz==2020.1
 redis==3.5.3
 requests==2.24.0
+selenium==3.141.0
 six==1.15.0
 soupsieve==2.0.1
 sqlparse==0.3.1
